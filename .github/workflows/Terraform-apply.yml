@@ -1,8 +1,8 @@
-name: 'Terraform plan'
+name: 'Terraform Apply'
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ jobs:
     name: 'Terraform'
     runs-on: ubuntu-latest
     environment: production
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+          # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
@@ -35,9 +35,7 @@ jobs:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v4
-
     # Get Tf key from KV
-    
     - name: Get KV value
       uses: Azure/get-keyvault-secrets@v1
       with:
@@ -60,8 +58,8 @@ jobs:
         -backend-config=use_oidc=true
         -backend-config=tenant_id=${{ secrets.AZURE_TENANT_ID }}
         -backend-config=client_id=${{ secrets.AZURE_CLIENT_ID }}
-        -backend-config=subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}      
-        
+        -backend-config=subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }} 
+
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
       run: terraform fmt -check
@@ -69,3 +67,9 @@ jobs:
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       run: terraform plan -input=false
+
+      # On push to "main", build or change infrastructure according to Terraform configuration files
+      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+    - name: Terraform Apply
+      #if: github.ref == 'refs/heads/"main"' && github.event_name == 'pull_request'
+      run: terraform apply -auto-approve -input=false
