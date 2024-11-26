@@ -1,0 +1,73 @@
+name: 'Terraform plan'
+
+on:
+  push:
+    branches: [ "dev" ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+env:
+  TF_STATE_STORAGE_ACCOUNT_NAME: "stgtfstate"
+  TF_STATE_CONTAINER_NAME: "contfstate"
+  TF_STATE_FILE_NAME: "apim.tfstate"
+  APIM_RESOURCE_GROUP: "mss-rg-apim"
+  APIM_KEY_VAULT_NAME: "kvapimsecrets"
+  APIM_TERRAFORM_STATE_RG: "rg-apim-common-services"
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: production
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Connect to Azure
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        enable-AzPSSession: true
+
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Get Tf key from KV
+    
+    - name: Get KV value
+      uses: Azure/get-keyvault-secrets@v1
+      with:
+        keyvault: ${{env.APIM_KEY_VAULT_NAME}}
+        secrets: 'tfstate-storage-key'
+      id: myGetSecretAction
+
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: > 
+        terraform init -backend=true -input=false
+        -backend-config=storage_account_name=${{env.TF_STATE_STORAGE_ACCOUNT_NAME}}
+        -backend-config=resource_group_name=${{ env.APIM_TERRAFORM_STATE_RG }}
+        -backend-config=container_name=${{env.TF_STATE_CONTAINER_NAME}}
+        -backend-config=key=${{ steps.myGetSecretAction.outputs.tfstate-storage-key }}
+        -backend-config=use_oidc=true
+        -backend-config=tenant_id=${{ secrets.ARM_TENANT_ID }}
+        -backend-config=client_id=${{ secrets.ARM_CLIENT_ID }}
+        -backend-config=subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}      
+
+    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Format
+      run: terraform fmt -check
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: terraform plan -input=false
