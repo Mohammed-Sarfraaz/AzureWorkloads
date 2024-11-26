@@ -3,10 +3,10 @@
 set -e
 
 export LOCATION=eastus
-export COMMON_RESOURCE_GROUP_NAME=rg-azure-common-services
-export TF_STATE_STORAGE_ACCOUNT_NAME=stgtfstate
-export TF_STATE_CONTAINER_NAME=contfstate
-export KEYVAULT_NAME=kvazuresecrets
+export COMMON_RESOURCE_GROUP_NAME=rg-azure-common-services-rg-mss
+export TF_STATE_STORAGE_ACCOUNT_NAME=stgtfstate-mss
+export TF_STATE_CONTAINER_NAME=contfstate-mss
+export KEYVAULT_NAME=kvazuresecrets-mss
 
 # Create the resource group
 if  ( `az group exists --resource-group $COMMON_RESOURCE_GROUP_NAME` == "true" );
