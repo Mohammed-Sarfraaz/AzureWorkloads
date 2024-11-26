@@ -11,10 +11,9 @@ permissions:
 env:
   TF_STATE_STORAGE_ACCOUNT_NAME: "stgtfstate"
   TF_STATE_CONTAINER_NAME: "contfstate"
-  TF_STATE_FILE_NAME: "apim.tfstate"
-  APIM_RESOURCE_GROUP: "mss-rg-apim"
-  APIM_KEY_VAULT_NAME: "kvapimsecrets"
-  APIM_TERRAFORM_STATE_RG: "rg-apim-common-services"
+  TF_STATE_FILE_NAME: "azure.tfstate"  
+  AZURE_KEY_VAULT_NAME: "kvazuresecrets"
+  AZURE_TERRAFORM_STATE_RG: "rg-azure-common-services"
 jobs:
   terraform:
     name: 'Terraform'
@@ -43,7 +42,7 @@ jobs:
     - name: Get KV value
       uses: Azure/get-keyvault-secrets@v1
       with:
-        keyvault: ${{env.APIM_KEY_VAULT_NAME}}
+        keyvault: ${{env.AZURE_KEY_VAULT_NAME}}
         secrets: 'tfstate-storage-key'
       id: myGetSecretAction
 
@@ -56,13 +55,13 @@ jobs:
       run: > 
         terraform init -backend=true -input=false
         -backend-config=storage_account_name=${{env.TF_STATE_STORAGE_ACCOUNT_NAME}}
-        -backend-config=resource_group_name=${{ env.APIM_TERRAFORM_STATE_RG }}
+        -backend-config=resource_group_name=${{ env.AZURE_TERRAFORM_STATE_RG }}
         -backend-config=container_name=${{env.TF_STATE_CONTAINER_NAME}}
         -backend-config=key=${{ steps.myGetSecretAction.outputs.tfstate-storage-key }}
         -backend-config=use_oidc=true
-        -backend-config=tenant_id=${{ secrets.ARM_TENANT_ID }}
-        -backend-config=client_id=${{ secrets.ARM_CLIENT_ID }}
-        -backend-config=subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}      
+        -backend-config=tenant_id=${{ secrets.AZURE_TENANT_ID }}
+        -backend-config=client_id=${{ secrets.AZURE_CLIENT_ID }}
+        -backend-config=subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}      
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format

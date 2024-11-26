@@ -3,10 +3,10 @@
 set -e
 
 export LOCATION=eastus
-export COMMON_RESOURCE_GROUP_NAME=rg-apim-common-services
+export COMMON_RESOURCE_GROUP_NAME=rg-azure-common-services
 export TF_STATE_STORAGE_ACCOUNT_NAME=stgtfstate
 export TF_STATE_CONTAINER_NAME=contfstate
-export KEYVAULT_NAME=kvapimsecrets
+export KEYVAULT_NAME=kvazuresecrets
 
 # Create the resource group
 if  ( `az group exists --resource-group $COMMON_RESOURCE_GROUP_NAME` == "true" );
