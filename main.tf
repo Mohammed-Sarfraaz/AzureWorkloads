@@ -1,9 +1,9 @@
-provider "azurerm" {
-  
+terraform {
+  backend "azurerm" {
+  }
 }
 
-resource "azurerm_resource_group" "test-rg-mss" {
-    location = "eastus"
-    name = "test-rg-mss"    
+resource "azurerm_resource_group" "rg" {
+  name     = "mss-rg-apim"
+  location = "eastus"
 }
-
