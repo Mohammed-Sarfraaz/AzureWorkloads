@@ -9,11 +9,12 @@ permissions:
   pages: write
   id-token: write
 env:
-  TF_STATE_STORAGE_ACCOUNT_NAME: "stgtfstate1"
-  TF_STATE_CONTAINER_NAME: "contfstate1" 
-  AZURE_KEY_VAULT_NAME: "kvazuresecrets"
-  AZURE_TERRAFORM_STATE_RG: "rg-azure-common-services-rg-mss"
-jobs:
+  TF_STATE_STORAGE_ACCOUNT_NAME: ${{ vars.TF_STATE_STORAGE_ACCOUNT_NAME }}
+  TF_STATE_CONTAINER_NAME: ${{ vars.TF_STATE_CONTAINER_NAME }} 
+  AZURE_KEY_VAULT_NAME: ${{ vars.KEYVAULT_NAME }}
+  AZURE_TERRAFORM_STATE_RG: ${{ vars.COMMON_RESOURCE_GROUP_NAME }}
+
+jobs:  
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
@@ -61,7 +62,7 @@ jobs:
         -backend-config=tenant_id=${{ secrets.AZURE_TENANT_ID }}
         -backend-config=client_id=${{ secrets.AZURE_CLIENT_ID }}
         -backend-config=subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}      
-        
+
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
       run: terraform fmt -check

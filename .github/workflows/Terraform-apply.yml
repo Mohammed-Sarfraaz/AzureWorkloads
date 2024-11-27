@@ -9,10 +9,11 @@ permissions:
   pages: write
   id-token: write
 env:
-  TF_STATE_STORAGE_ACCOUNT_NAME: "stgtfstate1"
-  TF_STATE_CONTAINER_NAME: "contfstate1" 
-  AZURE_KEY_VAULT_NAME: "kvazuresecrets"
-  AZURE_TERRAFORM_STATE_RG: "rg-azure-common-services-rg-mss"
+  TF_STATE_STORAGE_ACCOUNT_NAME: ${{ vars.TF_STATE_STORAGE_ACCOUNT_NAME }}
+  TF_STATE_CONTAINER_NAME: ${{ vars.TF_STATE_CONTAINER_NAME }} 
+  AZURE_KEY_VAULT_NAME: ${{ vars.KEYVAULT_NAME }}
+  AZURE_TERRAFORM_STATE_RG: ${{ vars.COMMON_RESOURCE_GROUP_NAME }}
+  
 jobs:
   terraform:
     name: 'Terraform'
