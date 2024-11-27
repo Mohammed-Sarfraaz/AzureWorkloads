@@ -34,5 +34,5 @@ jobs:
 
       - name: Call a Bash Script
         env:
-          TF_STATE_STORAGE_ACCOUNT_NAME: ${{ secrets.strorageaccount }}       
+          TF_STATE_STORAGE_ACCOUNT_NAME: ${{ secrets.TF_STATE_STORAGE_ACCOUNT_NAME }}       
         run:  bash ${GITHUB_WORKSPACE}/scripts/init-setup.sh
