@@ -31,8 +31,13 @@ jobs:
       # Checkout the repository to the GitHub Actions runner
       - name: Checkout
         uses: actions/checkout@v4
-
+      
+      # Call the bash script to deploy TF state and related resources
       - name: Call a Bash Script
         env:
-          TF_STATE_STORAGE_ACCOUNT_NAME: ${{ vars.TF_STATE_STORAGE_ACCOUNT_NAME }}       
+          LOCATION: ${{ vars.LOCATION }}
+          COMMON_RESOURCE_GROUP_NAME: ${{ vars.COMMON_RESOURCE_GROUP_NAME }}
+          TF_STATE_STORAGE_ACCOUNT_NAME: ${{ vars.TF_STATE_STORAGE_ACCOUNT_NAME }}
+          TF_STATE_CONTAINER_NAME: ${{ vars.TF_STATE_CONTAINER_NAME }}
+          KEYVAULT_NAME: ${{ vars.KEYVAULT_NAME }}                
         run:  bash ${GITHUB_WORKSPACE}/scripts/init-setup.sh
